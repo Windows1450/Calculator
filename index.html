@@ -245,7 +245,7 @@ button.b.s2  { grid-column:span 2; }
     <div class="display"><div class="d-expr" id="std-expr"></div><div class="d-main" id="std-disp">0</div></div>
     <div class="divider"></div>
     <div class="grid g4" style="flex:1;align-content:stretch">
-      <button class="b ac" onclick="stdAC()">AC</button><button class="b dim" onclick="stdSign()">+/−</button><button class="b dim" onclick="stdPct()">%</button><button class="b op" onclick="stdOp('/')">÷</button>
+      <button class="b ac" onclick="stdAC()">AC</button><button class="b dim" onclick="stdBS()">⌫</button><button class="b dim" onclick="stdPct()">%</button><button class="b op" onclick="stdOp('/')">÷</button>
       <button class="b" onclick="stdN('7')">7</button><button class="b" onclick="stdN('8')">8</button><button class="b" onclick="stdN('9')">9</button><button class="b op" onclick="stdOp('*')">×</button>
       <button class="b" onclick="stdN('4')">4</button><button class="b" onclick="stdN('5')">5</button><button class="b" onclick="stdN('6')">6</button><button class="b op" onclick="stdOp('-')">−</button>
       <button class="b" onclick="stdN('1')">1</button><button class="b" onclick="stdN('2')">2</button><button class="b" onclick="stdN('3')">3</button><button class="b op" onclick="stdOp('+')">+</button>
@@ -681,6 +681,7 @@ function stdDot(){if(SS.w){SS.disp='0.';SS.w=false;}else if(!SS.disp.includes('.
 function stdOp(o){const c=parseFloat(SS.disp);if(SS.prev!==null&&!SS.w){const r=op(SS.prev,c,SS.op);SS.disp=fC(r);SS.prev=r;}else SS.prev=c;SS.op=o;SS.w=true;SS.done=false;SS.expr=fC(SS.prev)+' '+opS(o);sR();}
 function stdEq(){if(SS.op===null||SS.w)return;const c=parseFloat(SS.disp);const r=op(SS.prev,c,SS.op);SS.expr=SS.expr+' '+SS.disp+' =';SS.disp=fC(r);SS.prev=null;SS.op=null;SS.w=false;SS.done=true;sR();}
 function stdAC(){Object.assign(SS,{disp:'0',expr:'',prev:null,op:null,w:false,done:false});sR();}
+function stdBS(){if(SS.done||SS.w)return;SS.disp=SS.disp.length>1?SS.disp.slice(0,-1):'0';sR();}
 function stdSign(){SS.disp=fC(-parseFloat(SS.disp));sR();}
 function stdPct(){SS.disp=fC(parseFloat(SS.disp)/100);sR();}
 
@@ -1125,7 +1126,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='+'){O('+');return;}if(e.key==='-'){O('-');return;}
   if(e.key==='*'){O('*');return;}if(e.key==='/'){e.preventDefault();O('/');return;}
   if(e.key==='Enter'||e.key==='='){E();return;}if(e.key==='Escape'){C();return;}
-  if(e.key==='.'){D();return;}if(e.key==='Backspace'&&ss){sciBS();}
+  if(e.key==='.'){D();return;}if(e.key==='Backspace'){if(bs)stdBS();else if(ss)sciBS();}
 });
 </script>
 </body>
