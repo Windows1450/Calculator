@@ -1,0 +1,19 @@
+{
+  "name": "多功能計算機",
+  "short_name": "計算機",
+  "description": "19 種計算機合一，含科學、貨幣、單位、貸款、BMI 等",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fffbfe",
+  "theme_color": "#6750a4",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

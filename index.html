@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>計算機</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6750a4" id="meta-theme">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="計算機">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+:root {
+  --bg:#fffbfe;
+  --card:#fffbfe;
+  --surface:#f3edf7;
+  --border:#e7e0ec;
+  --text:#1c1b1f;
+  --muted:#79747e;
+  --primary:#6750a4;
+  --primary-c:#eaddff;
+  --on-primary-c:#21005d;
+  --secondary-c:#e8def8;
+  --on-secondary-c:#1d192b;
+  --tertiary-c:#ffd8e4;
+  --btn:#e7e0ec;
+  --btn-a:#d3cce0;
+  --op-bg:#e8def8;
+  --op-t:#1d192b;
+  --op-a:#d5cde8;
+  --eq:#6750a4;
+  --eq-a:#4f378b;
+  --fn:#f3edf7;
+  --fn-t:#49454f;
+  --fn-a:#e7e0ec;
+  --red:#b3261e;
+  --green:#386a20;
+  --blue:#0059c3;
+  --elev1:0 1px 2px rgba(0,0,0,.07),0 1px 4px rgba(0,0,0,.06);
+  --elev2:0 2px 6px rgba(0,0,0,.1),0 1px 4px rgba(0,0,0,.07);
+}
+
+.dark {
+  --bg:#141218;
+  --card:#1c1b1f;
+  --surface:#2b2930;
+  --border:#48464c;
+  --text:#e6e1e5;
+  --muted:#938f99;
+  --primary:#d0bcff;
+  --primary-c:#4f378b;
+  --on-primary-c:#eaddff;
+  --secondary-c:#4a4458;
+  --on-secondary-c:#e8def8;
+  --tertiary-c:#633b48;
+  --btn:#2b2930;
+  --btn-a:#3b383f;
+  --op-bg:#4a4458;
+  --op-t:#e8def8;
+  --op-a:#58546a;
+  --eq:#d0bcff;
+  --eq-a:#b8a9e8;
+  --fn:#2b2930;
+  --fn-t:#cac4d0;
+  --fn-a:#3b383f;
+  --red:#f2b8b5;
+  --green:#b5ccb3;
+  --blue:#a8c7fa;
+  --elev1:0 1px 3px rgba(0,0,0,.3),0 1px 2px rgba(0,0,0,.25);
+  --elev2:0 2px 6px rgba(0,0,0,.36),0 1px 4px rgba(0,0,0,.28);
+}
+.dark button.b.eq { color:#1c1b1f; }
+
+html,body { height:100%; overflow:hidden; }
+body { font-family:-apple-system,'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); display:flex; justify-content:center; }
+.app { width:100%; max-width:480px; height:100dvh; display:flex; flex-direction:column; background:var(--card); position:relative; overflow:hidden; }
+
+/* SCREENS */
+.screen { position:absolute; inset:0; display:flex; flex-direction:column; background:var(--card); transform:translateX(100%); transition:transform .3s cubic-bezier(.4,0,.2,1); z-index:1; }
+.screen.active { transform:translateX(0); }
+#screen-home { transform:none; z-index:0; transition:transform .3s cubic-bezier(.4,0,.2,1); }
+#screen-home.pushed { transform:translateX(-30%); }
+
+/* HOME */
+.home-header { padding:28px 20px 12px; flex-shrink:0; }
+.home-title { font-size:2rem; font-weight:400; letter-spacing:-.3px; color:var(--text); }
+.home-body { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:0 12px 32px; }
+.sec-label { font-size:.72rem; font-weight:600; letter-spacing:1.8px; text-transform:uppercase; color:var(--primary); padding:20px 4px 10px; }
+.calc-item {
+  display:flex; align-items:center; padding:12px 14px; cursor:pointer; gap:14px;
+  touch-action:manipulation; border-radius:16px; margin-bottom:4px;
+  transition:background .12s;
+}
+.calc-item:active { background:var(--surface); }
+.calc-icon {
+  width:44px; height:44px; border-radius:14px; background:var(--secondary-c);
+  display:flex; align-items:center; justify-content:center; font-size:1.25rem; flex-shrink:0;
+  box-shadow:var(--elev1);
+}
+.calc-name { font-size:.97rem; font-weight:500; }
+.calc-desc { font-size:.74rem; color:var(--muted); margin-top:2px; }
+.calc-arrow { color:var(--muted); margin-left:auto; font-size:.9rem; }
+
+/* HEADER BAR */
+.hdr { height:56px; display:flex; align-items:center; padding:0 16px; border-bottom:1px solid var(--border); flex-shrink:0; }
+.hdr-title { flex:1; text-align:center; font-size:1rem; font-weight:600; letter-spacing:.2px; }
+.back { width:40px; height:40px; border:none; background:transparent; font-size:1.5rem; cursor:pointer; display:flex; align-items:center; justify-content:center; border-radius:50%; color:var(--primary); touch-action:manipulation; }
+.back:active { background:var(--primary-c); }
+.hdr-r { width:40px; }
+
+/* BODY */
+.body { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:16px; }
+.body.calc-layout { display:flex; flex-direction:column; padding:12px 12px 10px; }
+
+/* DISPLAY */
+.display {
+  flex-shrink:0; padding:18px 18px 16px; min-height:110px;
+  display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-end;
+  background:var(--primary-c); border-radius:24px; margin-bottom:14px;
+}
+.d-expr { color:var(--on-primary-c); opacity:.6; font-size:.88rem; min-height:18px; text-align:right; }
+.d-main { font-size:3.4rem; font-weight:300; text-align:right; line-height:1.15; letter-spacing:-2px; word-break:break-all; color:var(--on-primary-c); }
+.divider { display:none; }
+
+/* CALC BUTTONS */
+.grid { display:grid; gap:8px; }
+.g4 { grid-template-columns:repeat(4,1fr); }
+.g5 { grid-template-columns:repeat(5,1fr); }
+button.b {
+  border:none; border-radius:16px; font-size:1.15rem; font-weight:500;
+  cursor:pointer; background:var(--btn); color:var(--text);
+  user-select:none; touch-action:manipulation; min-height:58px;
+  transition:background .1s, transform .08s;
+  box-shadow:var(--elev1);
+}
+button.b:active { transform:scale(.94); box-shadow:none; }
+button.b.op  { background:var(--op-bg); color:var(--op-t); }
+button.b.op:active  { background:var(--op-a); }
+button.b.eq  { background:var(--eq); color:#fff; font-size:1.35rem; box-shadow:var(--elev2); }
+button.b.eq:active  { background:var(--eq-a); }
+button.b.ac  { background:var(--tertiary-c); color:var(--text); font-size:.95rem; }
+button.b.dim { color:var(--muted); }
+button.b.fn  { background:var(--fn); color:var(--fn-t); font-size:.8rem; min-height:44px; border-radius:12px; }
+button.b.fn:active { background:var(--fn-a); }
+button.b.s2  { grid-column:span 2; }
+
+/* FORM */
+.fg { margin-bottom:14px; }
+.fl { display:block; font-size:.75rem; color:var(--primary); font-weight:500; margin-bottom:6px; letter-spacing:.3px; }
+.fi, .fs {
+  width:100%; padding:13px 14px; background:var(--surface);
+  border:1.5px solid var(--border); border-radius:14px;
+  color:var(--text); font-size:1rem; outline:none; font-family:inherit;
+  transition:border-color .15s;
+}
+.fi:focus,.fs:focus { border-color:var(--primary); }
+.fs { cursor:pointer; -webkit-appearance:none; appearance:none; }
+.rc { background:var(--surface); border-radius:16px; padding:16px; margin-bottom:8px; box-shadow:var(--elev1); }
+.rl { font-size:.75rem; color:var(--primary); font-weight:500; margin-bottom:4px; }
+.rv { font-size:1.5rem; font-weight:400; letter-spacing:-.3px; }
+.rv.big { font-size:2rem; font-weight:300; }
+.rrow { display:flex; gap:8px; }
+.rrow .rc { flex:1; }
+.sep { height:1px; background:var(--border); margin:14px 0; }
+.tog-row { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px; }
+.tog { padding:7px 16px; border:1.5px solid var(--border); background:transparent; color:var(--muted); border-radius:20px; cursor:pointer; font-size:.82rem; touch-action:manipulation; font-family:inherit; }
+.tog.on { background:var(--secondary-c); color:var(--on-secondary-c); border-color:var(--primary); font-weight:600; }
+.pri-btn { width:100%; padding:15px; background:var(--eq); color:#fff; border:none; border-radius:14px; font-size:1rem; font-weight:600; cursor:pointer; margin-bottom:14px; font-family:inherit; touch-action:manipulation; box-shadow:var(--elev2); }
+.pri-btn:active { background:var(--eq-a); box-shadow:none; }
+.sec-btn { width:100%; padding:13px; background:var(--surface); border:1.5px dashed var(--border); border-radius:14px; color:var(--muted); font-size:.9rem; cursor:pointer; margin-bottom:14px; font-family:inherit; }
+.seg-tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+.seg { padding:6px 14px; border:1.5px solid var(--border); background:transparent; color:var(--muted); border-radius:20px; cursor:pointer; font-size:.8rem; touch-action:manipulation; }
+.seg.on { background:var(--secondary-c); color:var(--on-secondary-c); border-color:var(--primary); font-weight:600; }
+.curr-status { font-size:.72rem; padding:8px 12px; border-radius:10px; background:var(--surface); color:var(--muted); margin-bottom:14px; }
+.curr-status.ok { color:var(--green); }
+.curr-status.err { color:var(--red); }
+.rate-info { text-align:center; font-size:.74rem; color:var(--muted); margin-top:8px; }
+.grade-row { display:flex; gap:7px; align-items:center; margin-bottom:7px; }
+.rm-btn { width:36px; height:36px; border:none; background:var(--surface); border-radius:10px; cursor:pointer; color:var(--muted); font-size:1.1rem; flex-shrink:0; display:flex; align-items:center; justify-content:center; touch-action:manipulation; }
+.rm-btn:active { color:var(--red); background:var(--fn-a); }
+::-webkit-scrollbar { width:0; }
+.star-btn { border:none; background:transparent; font-size:1.2rem; cursor:pointer; padding:4px 6px; flex-shrink:0; touch-action:manipulation; line-height:1; color:var(--muted); }
+.star-btn.on { color:#f5a623; }
+.star-btn:active { transform:scale(1.3); }
+
+/* THEME SHEET */
+.theme-sheet { position:fixed; inset:0; z-index:200; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .22s; }
+.theme-sheet.open { opacity:1; pointer-events:all; }
+.theme-backdrop { position:absolute; inset:0; background:rgba(0,0,0,.45); }
+.theme-panel {
+  position:relative; z-index:1; width:100%; max-width:480px;
+  background:var(--card); border-radius:28px 28px 0 0; padding:24px 20px 36px;
+  transform:translateY(100%); transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.theme-sheet.open .theme-panel { transform:translateY(0); }
+.theme-panel h2 { font-size:1rem; font-weight:600; margin-bottom:18px; }
+.color-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:20px; }
+.cswatch {
+  aspect-ratio:1; border-radius:50%; border:3px solid transparent;
+  cursor:pointer; transition:transform .12s, border-color .12s;
+  touch-action:manipulation; outline:none;
+  box-shadow:0 2px 6px rgba(0,0,0,.2);
+}
+.cswatch:active { transform:scale(.88); }
+.cswatch.active { border-color:var(--text); transform:scale(1.12); }
+.theme-custom-row { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+.theme-custom-row label { font-size:.85rem; color:var(--muted); flex:1; }
+.color-input { width:48px; height:48px; border:none; border-radius:50%; cursor:pointer; padding:0; background:none; overflow:hidden; }
+.color-input::-webkit-color-swatch-wrapper { padding:0; }
+.color-input::-webkit-color-swatch { border:none; border-radius:50%; }
+.theme-close { width:100%; padding:14px; background:var(--surface); border:none; border-radius:14px; color:var(--text); font-size:.95rem; cursor:pointer; font-family:inherit; font-weight:500; }
+.theme-close:active { background:var(--btn-a); }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <div class="home-header" style="display:flex;align-items:center;justify-content:space-between">
+    <div class="home-title">計算機</div>
+    <div style="display:flex;gap:4px">
+      <button onclick="openTheme()" style="border:none;background:transparent;font-size:1.3rem;cursor:pointer;padding:6px;touch-action:manipulation">🎨</button>
+      <button id="dark-toggle" onclick="toggleDark()" style="border:none;background:transparent;font-size:1.3rem;cursor:pointer;padding:6px;touch-action:manipulation">🌙</button>
+    </div>
+  </div>
+  <div class="home-body">
+    <div id="fav-section">
+      <div class="sec-label">收藏夾</div>
+      <div id="fav-list"></div>
+    </div>
+    <div class="sec-label">所有計算機</div>
+    <div id="all-list"></div>
+  </div>
+</div>
+
+<!-- BASIC -->
+<div id="screen-basic" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">基礎計算機</div><div class="hdr-r"></div></div>
+  <div class="body calc-layout">
+    <div class="display"><div class="d-expr" id="std-expr"></div><div class="d-main" id="std-disp">0</div></div>
+    <div class="divider"></div>
+    <div class="grid g4" style="flex:1;align-content:stretch">
+      <button class="b ac" onclick="stdAC()">AC</button><button class="b dim" onclick="stdSign()">+/−</button><button class="b dim" onclick="stdPct()">%</button><button class="b op" onclick="stdOp('/')">÷</button>
+      <button class="b" onclick="stdN('7')">7</button><button class="b" onclick="stdN('8')">8</button><button class="b" onclick="stdN('9')">9</button><button class="b op" onclick="stdOp('*')">×</button>
+      <button class="b" onclick="stdN('4')">4</button><button class="b" onclick="stdN('5')">5</button><button class="b" onclick="stdN('6')">6</button><button class="b op" onclick="stdOp('-')">−</button>
+      <button class="b" onclick="stdN('1')">1</button><button class="b" onclick="stdN('2')">2</button><button class="b" onclick="stdN('3')">3</button><button class="b op" onclick="stdOp('+')">+</button>
+      <button class="b s2" onclick="stdN('0')">0</button><button class="b" onclick="stdDot()">.</button><button class="b eq" onclick="stdEq()">=</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCIENTIFIC -->
+<div id="screen-scientific" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">科學計算機</div><div class="hdr-r"></div></div>
+  <div class="body calc-layout">
+    <div class="display"><div class="d-expr" id="sci-expr"></div><div class="d-main" id="sci-disp">0</div></div>
+    <div class="divider"></div>
+    <div class="grid g5" style="margin-bottom:7px">
+      <button class="b fn" onclick="sciFn('sin')">sin</button><button class="b fn" onclick="sciFn('cos')">cos</button><button class="b fn" onclick="sciFn('tan')">tan</button><button class="b fn" onclick="sciFn('log')">log</button><button class="b fn" onclick="sciFn('ln')">ln</button>
+      <button class="b fn" onclick="sciFn('asin')">asin</button><button class="b fn" onclick="sciFn('acos')">acos</button><button class="b fn" onclick="sciFn('atan')">atan</button><button class="b fn" onclick="sciFn('sqrt')">√x</button><button class="b fn" onclick="sciFn('cbrt')">∛x</button>
+      <button class="b fn" onclick="sciFn('sq')">x²</button><button class="b fn" onclick="sciFn('cu')">x³</button><button class="b fn" onclick="sciFn('xpowy')">xʸ</button><button class="b fn" onclick="sciFn('pi')">π</button><button class="b fn" onclick="sciFn('e')">e</button>
+      <button class="b fn" onclick="sciFn('inv')">1/x</button><button class="b fn" onclick="sciFn('abs')">|x|</button><button class="b fn" onclick="sciFn('fact')">n!</button><button class="b fn" id="deg-btn" onclick="sciToggleDeg()">DEG</button><button class="b fn" onclick="sciBS()">⌫</button>
+    </div>
+    <div class="grid g4">
+      <button class="b ac" onclick="sciAC()">AC</button><button class="b dim" onclick="sciSign()">+/−</button><button class="b dim" onclick="sciPct()">%</button><button class="b op" onclick="sciOp('/')">÷</button>
+      <button class="b" onclick="sciN('7')">7</button><button class="b" onclick="sciN('8')">8</button><button class="b" onclick="sciN('9')">9</button><button class="b op" onclick="sciOp('*')">×</button>
+      <button class="b" onclick="sciN('4')">4</button><button class="b" onclick="sciN('5')">5</button><button class="b" onclick="sciN('6')">6</button><button class="b op" onclick="sciOp('-')">−</button>
+      <button class="b" onclick="sciN('1')">1</button><button class="b" onclick="sciN('2')">2</button><button class="b" onclick="sciN('3')">3</button><button class="b op" onclick="sciOp('+')">+</button>
+      <button class="b s2" onclick="sciN('0')">0</button><button class="b" onclick="sciDot()">.</button><button class="b eq" onclick="sciEq()">=</button>
+    </div>
+  </div>
+</div>
+
+<!-- CURRENCY -->
+<div id="screen-currency" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">貨幣轉換器</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="curr-status" id="curr-status">正在載入即時匯率…</div>
+    <div class="fg"><label class="fl">金額</label><input type="number" class="fi" id="c-from-val" value="1" oninput="currConv()"></div>
+    <div class="fg"><label class="fl">從</label><select class="fs" id="c-from" onchange="currConv()"></select></div>
+    <button class="pri-btn" style="background:var(--subtle);color:var(--text)" onclick="swapCurr()">⇅ 交換貨幣</button>
+    <div class="fg"><label class="fl">到</label><select class="fs" id="c-to" onchange="currConv()"></select></div>
+    <div class="rc"><div class="rl">換算結果</div><div class="rv big" id="c-to-val">—</div></div>
+    <div class="rate-info" id="rate-info"></div>
+  </div>
+</div>
+
+<!-- UNIT -->
+<div id="screen-unit" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">單位轉換器</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="seg-tabs" id="unit-segs"></div>
+    <div class="fg"><label class="fl">數值</label><input type="number" class="fi" id="u-from-val" placeholder="輸入數值" oninput="unitConv()"></div>
+    <div class="fg"><label class="fl">從</label><select class="fs" id="u-from" onchange="unitConv()"></select></div>
+    <div style="text-align:center;color:var(--muted);padding:4px 0 12px;font-size:1.1rem">⇅</div>
+    <div class="fg"><label class="fl">到</label><select class="fs" id="u-to" onchange="unitConv()"></select></div>
+    <div class="rc"><div class="rl">換算結果</div><div class="rv big" id="u-result">—</div></div>
+  </div>
+</div>
+
+<!-- DISCOUNT -->
+<div id="screen-discount" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">折扣計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">原價</label><input type="number" class="fi" id="disc-orig" placeholder="0" oninput="calcDiscount()"></div>
+    <div class="fg"><label class="fl">折扣 (%)</label><input type="number" class="fi" id="disc-pct" placeholder="0" oninput="calcDiscount()"></div>
+    <div class="rrow">
+      <div class="rc"><div class="rl">折扣後售價</div><div class="rv" id="disc-price">—</div></div>
+      <div class="rc"><div class="rl">節省金額</div><div class="rv" id="disc-save">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PERCENT -->
+<div id="screen-percent" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">百分比計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="tog-row">
+      <button class="tog on" onclick="setPctMode(0,this)">X% of Y</button>
+      <button class="tog" onclick="setPctMode(1,this)">X 是 Y 的幾%</button>
+      <button class="tog" onclick="setPctMode(2,this)">百分比變化</button>
+    </div>
+    <div id="pm0">
+      <div class="fg"><label class="fl">百分比 (%)</label><input type="number" class="fi" id="p0x" placeholder="0" oninput="calcP0()"></div>
+      <div class="fg"><label class="fl">數值 Y</label><input type="number" class="fi" id="p0y" placeholder="0" oninput="calcP0()"></div>
+      <div class="rc"><div class="rl">結果</div><div class="rv big" id="p0r">—</div></div>
+    </div>
+    <div id="pm1" style="display:none">
+      <div class="fg"><label class="fl">數值 X</label><input type="number" class="fi" id="p1x" placeholder="0" oninput="calcP1()"></div>
+      <div class="fg"><label class="fl">數值 Y</label><input type="number" class="fi" id="p1y" placeholder="0" oninput="calcP1()"></div>
+      <div class="rc"><div class="rl">X 是 Y 的</div><div class="rv big" id="p1r">—</div></div>
+    </div>
+    <div id="pm2" style="display:none">
+      <div class="fg"><label class="fl">原始值</label><input type="number" class="fi" id="p2x" placeholder="0" oninput="calcP2()"></div>
+      <div class="fg"><label class="fl">新值</label><input type="number" class="fi" id="p2y" placeholder="0" oninput="calcP2()"></div>
+      <div class="rc"><div class="rl">百分比變化</div><div class="rv big" id="p2r">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAX -->
+<div id="screen-tax" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">營業稅計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">稅前金額</label><input type="number" class="fi" id="tax-price" placeholder="0" oninput="calcTax()"></div>
+    <div class="fg"><label class="fl">稅率 (%)</label><input type="number" class="fi" id="tax-rate" value="5" oninput="calcTax()"></div>
+    <div class="rrow">
+      <div class="rc"><div class="rl">稅額</div><div class="rv" id="tax-amt">—</div></div>
+      <div class="rc"><div class="rl">含稅總價</div><div class="rv" id="tax-total">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- WORLD TIME -->
+<div id="screen-worldtime" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">世界時間轉換器</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">參考時間（以本地時間輸入）</label><input type="datetime-local" class="fi" id="tz-input" oninput="updateWorldTime()"></div>
+    <div class="sep"></div>
+    <div id="tz-results"></div>
+  </div>
+</div>
+
+<!-- SAVINGS -->
+<div id="screen-savings" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">儲蓄計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">初始本金</label><input type="number" class="fi" id="sav-p" placeholder="0" oninput="calcSav()"></div>
+    <div class="fg"><label class="fl">每月存入</label><input type="number" class="fi" id="sav-m" placeholder="0" oninput="calcSav()"></div>
+    <div class="fg"><label class="fl">年利率 (%)</label><input type="number" class="fi" id="sav-r" value="2" oninput="calcSav()"></div>
+    <div class="fg"><label class="fl">年數</label><input type="number" class="fi" id="sav-y" value="10" oninput="calcSav()"></div>
+    <div class="rrow">
+      <div class="rc"><div class="rl">最終金額</div><div class="rv" id="sav-total">—</div></div>
+      <div class="rc"><div class="rl">利息收益</div><div class="rv" id="sav-int">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HEX -->
+<div id="screen-hex" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">進位轉換器</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">十進位 (DEC)</label><input type="number" class="fi" id="hx-dec" placeholder="0" oninput="cvtBase('dec')"></div>
+    <div class="fg"><label class="fl">十六進位 (HEX)</label><input type="text" class="fi" id="hx-hex" placeholder="0" oninput="cvtBase('hex')" style="text-transform:uppercase"></div>
+    <div class="fg"><label class="fl">二進位 (BIN)</label><input type="text" class="fi" id="hx-bin" placeholder="0" oninput="cvtBase('bin')"></div>
+    <div class="fg"><label class="fl">八進位 (OCT)</label><input type="text" class="fi" id="hx-oct" placeholder="0" oninput="cvtBase('oct')"></div>
+  </div>
+</div>
+
+<!-- UNIT PRICE -->
+<div id="screen-unitprice" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">單價計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div style="font-size:.85rem;font-weight:500;margin-bottom:8px">商品 A</div>
+    <div class="rrow" style="margin-bottom:14px">
+      <div style="flex:1"><label class="fl">總價</label><input type="number" class="fi" id="up-ap" placeholder="0" oninput="calcUP()"></div>
+      <div style="flex:1"><label class="fl">數量</label><input type="number" class="fi" id="up-aq" placeholder="0" oninput="calcUP()"></div>
+    </div>
+    <div style="font-size:.85rem;font-weight:500;margin-bottom:8px">商品 B</div>
+    <div class="rrow" style="margin-bottom:14px">
+      <div style="flex:1"><label class="fl">總價</label><input type="number" class="fi" id="up-bp" placeholder="0" oninput="calcUP()"></div>
+      <div style="flex:1"><label class="fl">數量</label><input type="number" class="fi" id="up-bq" placeholder="0" oninput="calcUP()"></div>
+    </div>
+    <div class="rrow">
+      <div class="rc"><div class="rl">A 單價</div><div class="rv" id="up-au">—</div></div>
+      <div class="rc"><div class="rl">B 單價</div><div class="rv" id="up-bu">—</div></div>
+    </div>
+    <div class="rc" id="up-win" style="display:none;text-align:center"><div class="rv" id="up-win-t"></div></div>
+  </div>
+</div>
+
+<!-- TIP -->
+<div id="screen-tip" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">小費計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">消費金額</label><input type="number" class="fi" id="tip-bill" placeholder="0" oninput="calcTip()"></div>
+    <div class="fg">
+      <label class="fl">小費比例</label>
+      <div class="tog-row" style="margin-bottom:8px">
+        <button class="tog" onclick="setTipP(10,this)">10%</button>
+        <button class="tog on" onclick="setTipP(15,this)">15%</button>
+        <button class="tog" onclick="setTipP(18,this)">18%</button>
+        <button class="tog" onclick="setTipP(20,this)">20%</button>
+      </div>
+      <input type="number" class="fi" id="tip-pct" value="15" oninput="calcTip()">
+    </div>
+    <div class="fg"><label class="fl">分帳人數</label><input type="number" class="fi" id="tip-ppl" value="1" min="1" oninput="calcTip()"></div>
+    <div class="rrow">
+      <div class="rc"><div class="rl">小費金額</div><div class="rv" id="tip-amt">—</div></div>
+      <div class="rc"><div class="rl">每人付</div><div class="rv" id="tip-per">—</div></div>
+    </div>
+    <div class="rc"><div class="rl">總計</div><div class="rv big" id="tip-tot">—</div></div>
+  </div>
+</div>
+
+<!-- GPA -->
+<div id="screen-gpa" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">平均成績計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div style="display:flex;gap:7px;font-size:.72rem;color:var(--muted);margin-bottom:6px;padding:0 2px">
+      <span style="flex:1">科目</span><span style="width:68px;text-align:center">成績</span><span style="width:68px;text-align:center">學分</span><span style="width:34px"></span>
+    </div>
+    <div id="gpa-rows"></div>
+    <button class="sec-btn" onclick="addGpaRow()">+ 新增科目</button>
+    <div class="rrow">
+      <div class="rc"><div class="rl">加權平均</div><div class="rv big" id="gpa-avg">—</div></div>
+      <div class="rc"><div class="rl">總學分</div><div class="rv big" id="gpa-cred">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- OVULATION -->
+<div id="screen-ovulation" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">排卵日計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">上次月經開始日期</label><input type="date" class="fi" id="ov-lmp" oninput="calcOv()"></div>
+    <div class="fg"><label class="fl">月經週期（天）</label><input type="number" class="fi" id="ov-cycle" value="28" oninput="calcOv()"></div>
+    <div id="ov-res"></div>
+  </div>
+</div>
+
+<!-- DATE -->
+<div id="screen-date" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">日期計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="tog-row">
+      <button class="tog on" onclick="setDateMode(0,this)">日期差距</button>
+      <button class="tog" onclick="setDateMode(1,this)">日期加減</button>
+    </div>
+    <div id="dm0">
+      <div class="fg"><label class="fl">開始日期</label><input type="date" class="fi" id="d-from" oninput="calcDateDiff()"></div>
+      <div class="fg"><label class="fl">結束日期</label><input type="date" class="fi" id="d-to" oninput="calcDateDiff()"></div>
+      <div class="rrow">
+        <div class="rc"><div class="rl">天數</div><div class="rv big" id="d-days">—</div></div>
+        <div class="rc"><div class="rl">週數</div><div class="rv big" id="d-weeks">—</div></div>
+      </div>
+      <div class="rc"><div class="rl">年 / 月 / 日</div><div class="rv" id="d-ymd">—</div></div>
+    </div>
+    <div id="dm1" style="display:none">
+      <div class="fg"><label class="fl">起始日期</label><input type="date" class="fi" id="d-base" oninput="calcDateAdd()"></div>
+      <div class="fg"><label class="fl">加 / 減天數（負數為減）</label><input type="number" class="fi" id="d-add" placeholder="0" oninput="calcDateAdd()"></div>
+      <div class="rc"><div class="rl">結果日期</div><div class="rv" id="d-add-res">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FUEL COST -->
+<div id="screen-fuelcost" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">燃油成本計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">行駛距離 (km)</label><input type="number" class="fi" id="fc-dist" placeholder="0" oninput="calcFC()"></div>
+    <div class="fg"><label class="fl">油耗 (L/100km)</label><input type="number" class="fi" id="fc-eff" placeholder="10" oninput="calcFC()"></div>
+    <div class="fg"><label class="fl">油價 (元/公升)</label><input type="number" class="fi" id="fc-price" placeholder="30" oninput="calcFC()"></div>
+    <div class="rrow">
+      <div class="rc"><div class="rl">耗油量 (L)</div><div class="rv" id="fc-liters">—</div></div>
+      <div class="rc"><div class="rl">燃油費用 (元)</div><div class="rv" id="fc-cost">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FUEL EFF -->
+<div id="screen-fueleff" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">燃油效率計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">行駛距離 (km)</label><input type="number" class="fi" id="fe-dist" placeholder="0" oninput="calcFE()"></div>
+    <div class="fg"><label class="fl">使用油量 (L)</label><input type="number" class="fi" id="fe-fuel" placeholder="0" oninput="calcFE()"></div>
+    <div class="rrow">
+      <div class="rc"><div class="rl">L/100km</div><div class="rv" id="fe-l100">—</div></div>
+      <div class="rc"><div class="rl">km/L</div><div class="rv" id="fe-kpl">—</div></div>
+    </div>
+    <div class="rc"><div class="rl">英里/加侖 (MPG)</div><div class="rv" id="fe-mpg">—</div></div>
+  </div>
+</div>
+
+<!-- LOAN -->
+<div id="screen-loan" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">貸款計算機</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">貸款金額</label><input type="number" class="fi" id="ln-amt" placeholder="0" oninput="calcLoan()"></div>
+    <div class="fg"><label class="fl">年利率 (%)</label><input type="number" class="fi" id="ln-rate" value="3" oninput="calcLoan()"></div>
+    <div class="fg"><label class="fl">還款年數</label><input type="number" class="fi" id="ln-yrs" value="20" oninput="calcLoan()"></div>
+    <div class="rrow">
+      <div class="rc"><div class="rl">每月還款</div><div class="rv" id="ln-monthly">—</div></div>
+      <div class="rc"><div class="rl">總利息</div><div class="rv" id="ln-int">—</div></div>
+    </div>
+    <div class="rc"><div class="rl">還款總額</div><div class="rv big" id="ln-total">—</div></div>
+  </div>
+</div>
+
+<!-- BMI -->
+<div id="screen-bmi" class="screen">
+  <div class="hdr"><button class="back" onclick="goHome()">‹</button><div class="hdr-title">身體質量指數 BMI</div><div class="hdr-r"></div></div>
+  <div class="body">
+    <div class="fg"><label class="fl">身高 (cm)</label><input type="number" class="fi" id="bmi-h" placeholder="170" oninput="calcBMI()"></div>
+    <div class="fg"><label class="fl">體重 (kg)</label><input type="number" class="fi" id="bmi-w" placeholder="65" oninput="calcBMI()"></div>
+    <div class="rc"><div class="rl">BMI 值</div><div class="rv big" id="bmi-val">—</div></div>
+    <div class="rc"><div class="rl">狀態</div><div class="rv" id="bmi-status">—</div></div>
+    <div class="rc"><div class="rl">健康體重範圍 (BMI 18.5–23.9)</div><div class="rv" id="bmi-range">—</div></div>
+  </div>
+</div>
+
+<!-- THEME SHEET -->
+<div class="theme-sheet" id="theme-sheet" onclick="sheetBgClick(event)">
+  <div class="theme-backdrop"></div>
+  <div class="theme-panel">
+    <h2>選擇主題色</h2>
+    <div class="color-grid" id="color-grid"></div>
+    <div class="theme-custom-row">
+      <label>自訂顏色</label>
+      <input type="color" class="color-input" id="custom-color" value="#6750a4" oninput="applyTheme(this.value)">
+    </div>
+    <button class="theme-close" onclick="closeTheme()">完成</button>
+  </div>
+</div>
+
+</div><!-- .app -->
+<script>
+// ── LIST ─────────────────────────────────────────────────────────────────────
+const CALCS = [
+  {id:'basic',     name:'基礎計算機',     icon:'🔢', desc:'加減乘除基本運算'},
+  {id:'scientific',name:'科學計算機',     icon:'📐', desc:'sin、log、次方等進階運算'},
+  {id:'currency',  name:'貨幣轉換器',     icon:'💱', desc:'即時匯率換算'},
+  {id:'unit',      name:'單位轉換器',     icon:'📏', desc:'長度、重量、溫度等'},
+  {id:'discount',  name:'折扣計算機',     icon:'🏷️', desc:'折扣後售價與節省金額'},
+  {id:'percent',   name:'百分比計算機',   icon:'％', desc:'百分比換算與變化率'},
+  {id:'tax',       name:'營業稅計算機',   icon:'🧾', desc:'含稅金額計算'},
+  {id:'worldtime', name:'世界時間轉換器', icon:'🌍', desc:'各城市時區對照'},
+  {id:'savings',   name:'儲蓄計算機',     icon:'💰', desc:'複利計算與存款目標'},
+  {id:'hex',       name:'十六進位轉換器', icon:'0x', desc:'二、八、十、十六進位互換'},
+  {id:'unitprice', name:'單價計算機',     icon:'🛒', desc:'比較商品單位價格'},
+  {id:'tip',       name:'小費計算機',     icon:'🍽️', desc:'小費與分帳計算'},
+  {id:'gpa',       name:'平均成績計算機', icon:'📊', desc:'加權平均成績計算'},
+  {id:'ovulation', name:'排卵日計算機',   icon:'📅', desc:'安全期與受孕期推算'},
+  {id:'date',      name:'日期計算機',     icon:'📆', desc:'日期差距與加減計算'},
+  {id:'fuelcost',  name:'燃油成本計算機', icon:'⛽', desc:'行程油費估算'},
+  {id:'fueleff',   name:'燃油效率計算機', icon:'🚗', desc:'油耗與效率換算'},
+  {id:'loan',      name:'貸款計算機',     icon:'🏦', desc:'月供與利息計算'},
+  {id:'bmi',       name:'身體指標計算機', icon:'⚖️', desc:'BMI 計算與體重狀態'},
+];
+
+let favSet = new Set(JSON.parse(localStorage.getItem('calc-favs') || '[]'));
+
+function saveFavs() {
+  localStorage.setItem('calc-favs', JSON.stringify([...favSet]));
+}
+
+function renderFavSection() {
+  const sec = document.getElementById('fav-section');
+  const list = document.getElementById('fav-list');
+  list.innerHTML = '';
+  if (favSet.size === 0) { sec.style.display = 'none'; return; }
+  sec.style.display = 'block';
+  CALCS.filter(c => favSet.has(c.id)).forEach(c => list.appendChild(makeItem(c)));
+}
+
+function renderAllList() {
+  const list = document.getElementById('all-list');
+  list.innerHTML = '';
+  CALCS.filter(c => !favSet.has(c.id)).forEach(c => list.appendChild(makeItem(c)));
+}
+
+function makeItem(c) {
+  const d = document.createElement('div');
+  d.className = 'calc-item';
+  const starred = favSet.has(c.id);
+  d.innerHTML = `
+    <div class="calc-icon">${c.icon}</div>
+    <div style="flex:1"><div class="calc-name">${c.name}</div><div class="calc-desc">${c.desc}</div></div>
+    <button class="star-btn${starred ? ' on' : ''}" data-id="${c.id}" onclick="toggleFav(event,'${c.id}')">★</button>
+    <div class="calc-arrow" style="margin-left:2px">›</div>`;
+  d.querySelector('.calc-name').parentElement.parentElement.addEventListener('click', e => {
+    if (!e.target.classList.contains('star-btn')) goTo(c.id);
+  });
+  // Make the whole row clickable except the star
+  d.onclick = e => { if (!e.target.classList.contains('star-btn')) goTo(c.id); };
+  return d;
+}
+
+function toggleFav(e, id) {
+  e.stopPropagation();
+  if (favSet.has(id)) favSet.delete(id);
+  else favSet.add(id);
+  saveFavs();
+  renderFavSection();
+  renderAllList();
+}
+
+renderAllList();
+renderFavSection();
+
+// ── NAV ──────────────────────────────────────────────────────────────────────
+function goTo(id) {
+  document.getElementById('screen-home').classList.add('pushed');
+  document.getElementById('screen-' + id).classList.add('active');
+  if (id === 'worldtime') initWT();
+  if (id === 'gpa' && !document.getElementById('gpa-rows').children.length) { addGpaRow(); addGpaRow(); }
+  if (id === 'ovulation' && !document.getElementById('ov-lmp').value) {
+    document.getElementById('ov-lmp').value = today(); calcOv();
+  }
+  if (id === 'date') {
+    const tf = document.getElementById('d-from'), tt = document.getElementById('d-to'), tb = document.getElementById('d-base');
+    if (!tf.value) tf.value = today();
+    if (!tt.value) tt.value = today();
+    if (!tb.value) tb.value = today();
+    calcDateDiff();
+  }
+}
+function goHome() {
+  document.querySelector('.screen.active:not(#screen-home)')?.classList.remove('active');
+  document.getElementById('screen-home').classList.remove('pushed');
+}
+function today() { return new Date().toISOString().split('T')[0]; }
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function fmt(n, d=2) {
+  if (n === null || isNaN(n) || !isFinite(n)) return '—';
+  return Number(n.toFixed(d)).toLocaleString('zh-TW');
+}
+function fC(n) {
+  if (isNaN(n)) return '錯誤';
+  if (!isFinite(n)) return n > 0 ? '∞' : '-∞';
+  if (Number.isInteger(n) && Math.abs(n) < 1e15) return String(n);
+  return parseFloat(n.toPrecision(12)).toString();
+}
+function opS(o) { return {'+':'+','-':'−','*':'×','/':'÷','pow':'^'}[o]||o; }
+function op(a,b,o) {
+  if (o==='+') return a+b; if (o==='-') return a-b; if (o==='*') return a*b;
+  if (o==='/') return b===0?NaN:a/b; if (o==='pow') return Math.pow(a,b); return b;
+}
+
+// ── STANDARD ─────────────────────────────────────────────────────────────────
+const SS={disp:'0',expr:'',prev:null,op:null,w:false,done:false};
+function sR(){let d=SS.disp;if(d!=='錯誤'&&d.replace('-','').replace('.','').length>13)d=parseFloat(d).toExponential(6);document.getElementById('std-disp').textContent=d;document.getElementById('std-expr').textContent=SS.expr;}
+function stdN(n){if(SS.done){SS.disp=n;SS.expr='';SS.done=false;}else if(SS.w){SS.disp=n;SS.w=false;}else SS.disp=SS.disp==='0'?n:SS.disp+n;sR();}
+function stdDot(){if(SS.w){SS.disp='0.';SS.w=false;}else if(!SS.disp.includes('.'))SS.disp+='.';SS.done=false;sR();}
+function stdOp(o){const c=parseFloat(SS.disp);if(SS.prev!==null&&!SS.w){const r=op(SS.prev,c,SS.op);SS.disp=fC(r);SS.prev=r;}else SS.prev=c;SS.op=o;SS.w=true;SS.done=false;SS.expr=fC(SS.prev)+' '+opS(o);sR();}
+function stdEq(){if(SS.op===null||SS.w)return;const c=parseFloat(SS.disp);const r=op(SS.prev,c,SS.op);SS.expr=SS.expr+' '+SS.disp+' =';SS.disp=fC(r);SS.prev=null;SS.op=null;SS.w=false;SS.done=true;sR();}
+function stdAC(){Object.assign(SS,{disp:'0',expr:'',prev:null,op:null,w:false,done:false});sR();}
+function stdSign(){SS.disp=fC(-parseFloat(SS.disp));sR();}
+function stdPct(){SS.disp=fC(parseFloat(SS.disp)/100);sR();}
+
+// ── SCIENTIFIC ───────────────────────────────────────────────────────────────
+const SC={disp:'0',expr:'',prev:null,op:null,w:false,done:false,deg:true};
+function scR(){document.getElementById('sci-disp').textContent=SC.disp;document.getElementById('sci-expr').textContent=SC.expr;}
+function sciN(n){if(SC.done){SC.disp=n;SC.expr='';SC.done=false;}else if(SC.w){SC.disp=n;SC.w=false;}else SC.disp=SC.disp==='0'?n:SC.disp+n;scR();}
+function sciDot(){if(SC.w){SC.disp='0.';SC.w=false;}else if(!SC.disp.includes('.'))SC.disp+='.';SC.done=false;scR();}
+function sciOp(o){const c=parseFloat(SC.disp);if(SC.prev!==null&&!SC.w){const r=op(SC.prev,c,SC.op);SC.disp=fC(r);SC.prev=r;}else SC.prev=c;SC.op=o;SC.w=true;SC.done=false;SC.expr=fC(SC.prev)+' '+opS(o);scR();}
+function sciEq(){if(SC.op===null||SC.w)return;const c=parseFloat(SC.disp);const r=op(SC.prev,c,SC.op);SC.expr=SC.expr+' '+SC.disp+' =';SC.disp=fC(r);SC.prev=null;SC.op=null;SC.w=false;SC.done=true;scR();}
+function sciAC(){Object.assign(SC,{disp:'0',expr:'',prev:null,op:null,w:false,done:false,deg:SC.deg});scR();}
+function sciSign(){SC.disp=fC(-parseFloat(SC.disp));scR();}
+function sciPct(){SC.disp=fC(parseFloat(SC.disp)/100);scR();}
+function sciBS(){SC.disp=SC.disp.length>1?SC.disp.slice(0,-1):'0';scR();}
+function sciToggleDeg(){SC.deg=!SC.deg;document.getElementById('deg-btn').textContent=SC.deg?'DEG':'RAD';}
+function tR(x){return SC.deg?x*Math.PI/180:x;}
+function fR(x){return SC.deg?x*180/Math.PI:x;}
+function fact(n){n=Math.floor(n);if(n<0)return NaN;if(n>170)return Infinity;let r=1;for(let i=2;i<=n;i++)r*=i;return r;}
+function sciFn(fn){
+  const v=parseFloat(SC.disp);let r,ex;
+  const m={sin:[Math.sin(tR(v)),`sin(${v})`],cos:[Math.cos(tR(v)),`cos(${v})`],tan:[Math.tan(tR(v)),`tan(${v})`],
+    asin:[fR(Math.asin(v)),`asin(${v})`],acos:[fR(Math.acos(v)),`acos(${v})`],atan:[fR(Math.atan(v)),`atan(${v})`],
+    log:[Math.log10(v),`log(${v})`],ln:[Math.log(v),`ln(${v})`],sqrt:[Math.sqrt(v),`√(${v})`],
+    cbrt:[Math.cbrt(v),`∛(${v})`],sq:[v*v,`(${v})²`],cu:[v*v*v,`(${v})³`],
+    pi:[Math.PI,'π'],e:[Math.E,'e'],inv:[1/v,`1/(${v})`],abs:[Math.abs(v),`|${v}|`],fact:[fact(v),`(${v})!`]};
+  if(fn==='xpowy'){SC.prev=v;SC.op='pow';SC.w=true;SC.expr=`(${v})^`;scR();return;}
+  if(!m[fn])return;
+  [r,ex]=m[fn];
+  SC.disp=fC(r);SC.expr=ex+' =';SC.done=true;SC.prev=null;SC.op=null;scR();
+}
+
+// ── CURRENCY ─────────────────────────────────────────────────────────────────
+const CURR=[
+  {c:'TWD',n:'新台幣'},{c:'USD',n:'美元'},{c:'EUR',n:'歐元'},{c:'JPY',n:'日圓'},
+  {c:'CNY',n:'人民幣'},{c:'GBP',n:'英鎊'},{c:'HKD',n:'港幣'},{c:'KRW',n:'韓圓'},
+  {c:'AUD',n:'澳元'},{c:'CAD',n:'加元'},{c:'SGD',n:'新加坡元'},{c:'CHF',n:'瑞士法郎'},
+  {c:'THB',n:'泰銖'},{c:'MYR',n:'馬來西亞林吉特'},{c:'VND',n:'越南盾'},
+  {c:'PHP',n:'菲律賓披索'},{c:'IDR',n:'印尼盾'},{c:'INR',n:'印度盧比'},
+];
+const FB={TWD:32,USD:1,EUR:.92,JPY:149.5,CNY:7.24,GBP:.79,HKD:7.82,KRW:1325,AUD:1.53,CAD:1.36,SGD:1.34,CHF:.89,THB:35.1,MYR:4.72,VND:24500,PHP:56.5,IDR:15700,INR:83.2};
+let rates=null;
+async function loadRates(){
+  const st=document.getElementById('curr-status');
+  try{
+    const res=await fetch('https://open.er-api.com/v6/latest/USD');
+    const d=await res.json();
+    if(d.result!=='success')throw 0;
+    rates=d.rates;
+    st.className='curr-status ok';
+    st.textContent='✓ 即時匯率：'+new Date(d.time_last_update_utc).toLocaleString('zh-TW');
+    currConv();
+  }catch{
+    rates=FB;st.className='curr-status err';st.textContent='⚠ 使用參考匯率';currConv();
+  }
+}
+(()=>{const o=CURR.map(c=>`<option value="${c.c}">${c.c} — ${c.n}</option>`).join('');
+  ['c-from','c-to'].forEach(id=>document.getElementById(id).innerHTML=o);
+  document.getElementById('c-from').value='USD';document.getElementById('c-to').value='TWD';
+})();
+loadRates();
+function currConv(){
+  if(!rates)return;
+  const v=parseFloat(document.getElementById('c-from-val').value);
+  if(isNaN(v)){document.getElementById('c-to-val').textContent='—';return;}
+  const f=document.getElementById('c-from').value,t=document.getElementById('c-to').value;
+  const res=(v/rates[f])*rates[t];
+  document.getElementById('c-to-val').textContent=res.toFixed(4)+' '+t;
+  document.getElementById('rate-info').textContent=`1 ${f} = ${(rates[t]/rates[f]).toFixed(6)} ${t}`;
+}
+function swapCurr(){const f=document.getElementById('c-from'),t=document.getElementById('c-to');[f.value,t.value]=[t.value,f.value];currConv();}
+
+// ── UNITS ─────────────────────────────────────────────────────────────────────
+const UDEFS={
+  length:{l:'長度',u:[{k:'mm',l:'毫米 (mm)',f:.001},{k:'cm',l:'公分 (cm)',f:.01},{k:'m',l:'公尺 (m)',f:1},{k:'km',l:'公里 (km)',f:1000},{k:'in',l:'英吋 (in)',f:.0254},{k:'ft',l:'英呎 (ft)',f:.3048},{k:'mi',l:'英里 (mi)',f:1609.344}]},
+  weight:{l:'重量',u:[{k:'mg',l:'毫克 (mg)',f:.001},{k:'g',l:'公克 (g)',f:1},{k:'kg',l:'公斤 (kg)',f:1000},{k:'t',l:'公噸 (t)',f:1e6},{k:'oz',l:'盎司 (oz)',f:28.35},{k:'lb',l:'磅 (lb)',f:453.59}]},
+  temp:{l:'溫度',u:[{k:'C',l:'攝氏 °C'},{k:'F',l:'華氏 °F'},{k:'K',l:'克耳文 K'}]},
+  area:{l:'面積',u:[{k:'m2',l:'平方公尺 (m²)',f:1},{k:'km2',l:'平方公里 (km²)',f:1e6},{k:'ha',l:'公頃 (ha)',f:1e4},{k:'ac',l:'英畝 (ac)',f:4046.86},{k:'ft2',l:'平方英呎 (ft²)',f:.0929},{k:'ping',l:'坪',f:3.306}]},
+  speed:{l:'速度',u:[{k:'ms',l:'公尺/秒 (m/s)',f:1},{k:'kmh',l:'公里/時 (km/h)',f:1/3.6},{k:'mph',l:'英里/時 (mph)',f:.44704},{k:'kn',l:'節 (kn)',f:.5144}]},
+};
+let uT='length';
+function buildSegs(){
+  const c=document.getElementById('unit-segs');c.innerHTML='';
+  Object.entries(UDEFS).forEach(([k,v])=>{
+    const b=document.createElement('button');b.className='seg'+(k===uT?' on':'');b.textContent=v.l;
+    b.onclick=()=>{uT=k;buildSegs();renderUSelects();document.getElementById('u-from-val').value='';document.getElementById('u-result').textContent='—';};
+    c.appendChild(b);
+  });
+}
+function renderUSelects(){
+  const list=UDEFS[uT].u;
+  const o=(di)=>list.map((u,i)=>`<option value="${u.k}"${i===di?' selected':''}>${u.l}</option>`).join('');
+  document.getElementById('u-from').innerHTML=o(0);
+  document.getElementById('u-to').innerHTML=o(1);
+}
+function toB(v,k,t){
+  if(t==='temp'){if(k==='C')return v;if(k==='F')return(v-32)*5/9;if(k==='K')return v-273.15;}
+  return v*UDEFS[t].u.find(x=>x.k===k).f;
+}
+function frB(v,k,t){
+  if(t==='temp'){if(k==='C')return v;if(k==='F')return v*9/5+32;if(k==='K')return v+273.15;}
+  return v/UDEFS[t].u.find(x=>x.k===k).f;
+}
+function unitConv(){
+  const v=parseFloat(document.getElementById('u-from-val').value);
+  if(isNaN(v)){document.getElementById('u-result').textContent='—';return;}
+  const r=frB(toB(v,document.getElementById('u-from').value,uT),document.getElementById('u-to').value,uT);
+  document.getElementById('u-result').textContent=parseFloat(r.toPrecision(10)).toLocaleString('zh-TW');
+}
+buildSegs();renderUSelects();
+
+// ── DISCOUNT ──────────────────────────────────────────────────────────────────
+function calcDiscount(){
+  const orig=parseFloat(document.getElementById('disc-orig').value);
+  const pct=parseFloat(document.getElementById('disc-pct').value);
+  if(isNaN(orig)||isNaN(pct))return;
+  const save=orig*pct/100;
+  document.getElementById('disc-price').textContent=fmt(orig-save);
+  document.getElementById('disc-save').textContent=fmt(save);
+}
+
+// ── PERCENT ───────────────────────────────────────────────────────────────────
+function setPctMode(m,btn){
+  document.querySelectorAll('#screen-percent .tog').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  [0,1,2].forEach(i=>document.getElementById('pm'+i).style.display=i===m?'block':'none');
+}
+function calcP0(){const x=parseFloat(document.getElementById('p0x').value),y=parseFloat(document.getElementById('p0y').value);document.getElementById('p0r').textContent=(isNaN(x)||isNaN(y))?'—':fmt(x/100*y);}
+function calcP1(){const x=parseFloat(document.getElementById('p1x').value),y=parseFloat(document.getElementById('p1y').value);document.getElementById('p1r').textContent=(isNaN(x)||isNaN(y)||y===0)?'—':fmt(x/y*100)+'%';}
+function calcP2(){
+  const x=parseFloat(document.getElementById('p2x').value),y=parseFloat(document.getElementById('p2y').value);
+  if(isNaN(x)||isNaN(y)||x===0){document.getElementById('p2r').textContent='—';return;}
+  const c=(y-x)/x*100;const el=document.getElementById('p2r');
+  el.textContent=(c>=0?'+':'')+fmt(c)+'%';el.style.color=c>=0?'var(--green)':'var(--red)';
+}
+
+// ── TAX ───────────────────────────────────────────────────────────────────────
+function calcTax(){
+  const p=parseFloat(document.getElementById('tax-price').value),r=parseFloat(document.getElementById('tax-rate').value);
+  if(isNaN(p)||isNaN(r))return;
+  document.getElementById('tax-amt').textContent=fmt(p*r/100);
+  document.getElementById('tax-total').textContent=fmt(p*(1+r/100));
+}
+
+// ── WORLD TIME ────────────────────────────────────────────────────────────────
+const TZS=[
+  {n:'台北',z:'Asia/Taipei'},{n:'東京',z:'Asia/Tokyo'},{n:'首爾',z:'Asia/Seoul'},
+  {n:'上海',z:'Asia/Shanghai'},{n:'香港',z:'Asia/Hong_Kong'},{n:'新加坡',z:'Asia/Singapore'},
+  {n:'曼谷',z:'Asia/Bangkok'},{n:'孟買',z:'Asia/Kolkata'},{n:'杜拜',z:'Asia/Dubai'},
+  {n:'莫斯科',z:'Europe/Moscow'},{n:'巴黎',z:'Europe/Paris'},{n:'倫敦',z:'Europe/London'},
+  {n:'紐約',z:'America/New_York'},{n:'芝加哥',z:'America/Chicago'},{n:'洛杉磯',z:'America/Los_Angeles'},
+  {n:'悉尼',z:'Australia/Sydney'},{n:'奧克蘭',z:'Pacific/Auckland'},{n:'夏威夷',z:'Pacific/Honolulu'},
+];
+function initWT(){
+  const inp=document.getElementById('tz-input');
+  if(!inp.value){
+    const n=new Date();
+    inp.value=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')+'T'+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  }
+  updateWorldTime();
+}
+function updateWorldTime(){
+  const v=document.getElementById('tz-input').value;if(!v)return;
+  const d=new Date(v);if(isNaN(d))return;
+  document.getElementById('tz-results').innerHTML=TZS.map(t=>{
+    const s=new Intl.DateTimeFormat('zh-TW',{timeZone:t.z,weekday:'short',month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(d);
+    return`<div class="rc" style="margin-bottom:7px"><div class="rl">${t.n}</div><div class="rv">${s}</div></div>`;
+  }).join('');
+}
+
+// ── SAVINGS ───────────────────────────────────────────────────────────────────
+function calcSav(){
+  const P=parseFloat(document.getElementById('sav-p').value)||0;
+  const M=parseFloat(document.getElementById('sav-m').value)||0;
+  const r=parseFloat(document.getElementById('sav-r').value)/100/12;
+  const n=parseFloat(document.getElementById('sav-y').value)*12;
+  if(!n)return;
+  const total=r===0?P+M*n:P*Math.pow(1+r,n)+M*(Math.pow(1+r,n)-1)/r;
+  document.getElementById('sav-total').textContent=fmt(total);
+  document.getElementById('sav-int').textContent=fmt(total-P-M*n);
+}
+calcSav();
+
+// ── HEX ───────────────────────────────────────────────────────────────────────
+let bLock=false;
+function cvtBase(from){
+  if(bLock)return;bLock=true;
+  let v;
+  if(from==='dec')v=parseInt(document.getElementById('hx-dec').value);
+  else if(from==='hex')v=parseInt(document.getElementById('hx-hex').value,16);
+  else if(from==='bin')v=parseInt(document.getElementById('hx-bin').value,2);
+  else v=parseInt(document.getElementById('hx-oct').value,8);
+  if(!isNaN(v)&&v>=0){
+    if(from!=='dec')document.getElementById('hx-dec').value=v;
+    if(from!=='hex')document.getElementById('hx-hex').value=v.toString(16).toUpperCase();
+    if(from!=='bin')document.getElementById('hx-bin').value=v.toString(2);
+    if(from!=='oct')document.getElementById('hx-oct').value=v.toString(8);
+  }
+  bLock=false;
+}
+
+// ── UNIT PRICE ────────────────────────────────────────────────────────────────
+function calcUP(){
+  const ap=parseFloat(document.getElementById('up-ap').value),aq=parseFloat(document.getElementById('up-aq').value);
+  const bp=parseFloat(document.getElementById('up-bp').value),bq=parseFloat(document.getElementById('up-bq').value);
+  const au=(!isNaN(ap)&&!isNaN(aq)&&aq>0)?ap/aq:null;
+  const bu=(!isNaN(bp)&&!isNaN(bq)&&bq>0)?bp/bq:null;
+  document.getElementById('up-au').textContent=au!==null?fmt(au,4):'—';
+  document.getElementById('up-bu').textContent=bu!==null?fmt(bu,4):'—';
+  const w=document.getElementById('up-win');
+  if(au!==null&&bu!==null){
+    w.style.display='block';
+    const diff=Math.abs(au-bu)/Math.max(au,bu)*100;
+    document.getElementById('up-win-t').textContent=au<bu?`✓ 商品 A 較便宜（省 ${fmt(diff,1)}%）`:au>bu?`✓ 商品 B 較便宜（省 ${fmt(diff,1)}%）`:'兩者單價相同';
+  }else w.style.display='none';
+}
+
+// ── TIP ───────────────────────────────────────────────────────────────────────
+function setTipP(p,btn){document.getElementById('tip-pct').value=p;document.querySelectorAll('#screen-tip .tog').forEach(b=>b.classList.remove('on'));btn.classList.add('on');calcTip();}
+function calcTip(){
+  const b=parseFloat(document.getElementById('tip-bill').value)||0;
+  const p=parseFloat(document.getElementById('tip-pct').value)||0;
+  const n=Math.max(1,parseInt(document.getElementById('tip-ppl').value)||1);
+  const tip=b*p/100,total=b+tip;
+  document.getElementById('tip-amt').textContent=fmt(tip);
+  document.getElementById('tip-tot').textContent=fmt(total);
+  document.getElementById('tip-per').textContent=fmt(total/n);
+}
+calcTip();
+
+// ── GPA ───────────────────────────────────────────────────────────────────────
+let gID=0;
+function addGpaRow(){
+  const id=gID++;const row=document.createElement('div');row.className='grade-row';row.id='gr'+id;
+  row.innerHTML=`<input type="text" class="fi" placeholder="科目" style="flex:1" oninput="calcGPA()"><input type="number" class="fi" placeholder="成績" style="width:68px;flex:none" oninput="calcGPA()"><input type="number" class="fi" placeholder="學分" style="width:68px;flex:none" oninput="calcGPA()"><button class="rm-btn" onclick="document.getElementById('gr${id}').remove();calcGPA()">×</button>`;
+  document.getElementById('gpa-rows').appendChild(row);
+}
+function calcGPA(){
+  let tc=0,ws=0;
+  document.querySelectorAll('#gpa-rows .grade-row').forEach(row=>{
+    const inp=row.querySelectorAll('input[type=number]');
+    const g=parseFloat(inp[0].value),c=parseFloat(inp[1].value);
+    if(!isNaN(g)&&!isNaN(c)&&c>0){ws+=g*c;tc+=c;}
+  });
+  document.getElementById('gpa-avg').textContent=tc>0?fmt(ws/tc,2):'—';
+  document.getElementById('gpa-cred').textContent=tc>0?String(tc):'—';
+}
+
+// ── OVULATION ─────────────────────────────────────────────────────────────────
+function calcOv(){
+  const s=document.getElementById('ov-lmp').value;const cy=parseInt(document.getElementById('ov-cycle').value)||28;
+  if(!s)return;
+  const lmp=new Date(s);
+  const ov=new Date(lmp.getTime()+(cy-14)*864e5);
+  const fs=new Date(ov.getTime()-5*864e5),fe=new Date(ov.getTime()+864e5);
+  const np=new Date(lmp.getTime()+cy*864e5);
+  const fd=d=>d.toLocaleDateString('zh-TW',{month:'long',day:'numeric',weekday:'short'});
+  document.getElementById('ov-res').innerHTML=
+    `<div class="rc" style="margin-bottom:8px"><div class="rl">預計排卵日</div><div class="rv">${fd(ov)}</div></div>`+
+    `<div class="rc" style="margin-bottom:8px"><div class="rl">易受孕期</div><div class="rv">${fd(fs)} ~ ${fd(fe)}</div></div>`+
+    `<div class="rc"><div class="rl">下次月經預計日期</div><div class="rv">${fd(np)}</div></div>`;
+}
+
+// ── DATE ──────────────────────────────────────────────────────────────────────
+function setDateMode(m,btn){
+  document.querySelectorAll('#screen-date .tog').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  document.getElementById('dm0').style.display=m===0?'block':'none';
+  document.getElementById('dm1').style.display=m===1?'block':'none';
+}
+function calcDateDiff(){
+  const a=new Date(document.getElementById('d-from').value),b=new Date(document.getElementById('d-to').value);
+  if(isNaN(a)||isNaN(b))return;
+  const days=Math.round(Math.abs(b-a)/864e5);
+  document.getElementById('d-days').textContent=days.toLocaleString();
+  document.getElementById('d-weeks').textContent=(days/7).toFixed(1);
+  let lo=a<b?a:b,hi=a<b?b:a,m=0;
+  const t=new Date(lo);
+  while(t<hi){t.setMonth(t.getMonth()+1);m++;}
+  if(t>hi){t.setMonth(t.getMonth()-1);m--;}
+  const d=Math.round((hi-t)/864e5);
+  document.getElementById('d-ymd').textContent=`${Math.floor(m/12)} 年 ${m%12} 個月 ${d} 天`;
+}
+function calcDateAdd(){
+  const base=new Date(document.getElementById('d-base').value);
+  const d=parseInt(document.getElementById('d-add').value)||0;
+  if(isNaN(base))return;
+  const res=new Date(base.getTime()+d*864e5);
+  document.getElementById('d-add-res').textContent=res.toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+}
+
+// ── FUEL COST ─────────────────────────────────────────────────────────────────
+function calcFC(){
+  const dist=parseFloat(document.getElementById('fc-dist').value),eff=parseFloat(document.getElementById('fc-eff').value),price=parseFloat(document.getElementById('fc-price').value);
+  if(isNaN(dist)||isNaN(eff)||isNaN(price)||eff===0)return;
+  const L=dist*eff/100;
+  document.getElementById('fc-liters').textContent=fmt(L,2);
+  document.getElementById('fc-cost').textContent=fmt(L*price);
+}
+
+// ── FUEL EFF ──────────────────────────────────────────────────────────────────
+function calcFE(){
+  const d=parseFloat(document.getElementById('fe-dist').value),f=parseFloat(document.getElementById('fe-fuel').value);
+  if(isNaN(d)||isNaN(f)||f===0)return;
+  document.getElementById('fe-l100').textContent=fmt(f/d*100,2);
+  document.getElementById('fe-kpl').textContent=fmt(d/f,2);
+  document.getElementById('fe-mpg').textContent=fmt(d/f*2.352,2);
+}
+
+// ── LOAN ──────────────────────────────────────────────────────────────────────
+function calcLoan(){
+  const P=parseFloat(document.getElementById('ln-amt').value);
+  const r=parseFloat(document.getElementById('ln-rate').value)/100/12;
+  const n=parseFloat(document.getElementById('ln-yrs').value)*12;
+  if(isNaN(P)||isNaN(r)||isNaN(n)||n<=0)return;
+  const m=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+  document.getElementById('ln-monthly').textContent=fmt(m);
+  document.getElementById('ln-int').textContent=fmt(m*n-P);
+  document.getElementById('ln-total').textContent=fmt(m*n);
+}
+calcLoan();
+
+// ── BMI ───────────────────────────────────────────────────────────────────────
+function calcBMI(){
+  const h=parseFloat(document.getElementById('bmi-h').value)/100,w=parseFloat(document.getElementById('bmi-w').value);
+  if(isNaN(h)||isNaN(w)||h<=0)return;
+  const bmi=w/(h*h);
+  document.getElementById('bmi-val').textContent=bmi.toFixed(1);
+  const el=document.getElementById('bmi-status');
+  let s,c;
+  if(bmi<18.5){s='體重過輕';c='var(--blue)';}
+  else if(bmi<24){s='正常體重';c='var(--green)';}
+  else if(bmi<27){s='體重過重';c='orange';}
+  else if(bmi<30){s='輕度肥胖';c='darkorange';}
+  else{s='肥胖';c='var(--red)';}
+  el.textContent=s;el.style.color=c;
+  document.getElementById('bmi-range').textContent=`${fmt(18.5*h*h,1)} ~ ${fmt(23.9*h*h,1)} kg`;
+}
+
+// ── THEME ─────────────────────────────────────────────────────────────────────
+const PRESETS = [
+  '#6750a4','#1565c0','#006874','#2e7d32',
+  '#e65100','#c62828','#ad1457','#4527a0',
+  '#795548','#37474f',
+];
+
+function hexToHSL(hex) {
+  let r = parseInt(hex.slice(1,3),16)/255, g = parseInt(hex.slice(3,5),16)/255, b = parseInt(hex.slice(5,7),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  let h = 0, s = 0, l = (max+min)/2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > .5 ? d/(2-max-min) : d/(max+min);
+    if (max===r) h = ((g-b)/d + (g<b?6:0))/6;
+    else if (max===g) h = ((b-r)/d + 2)/6;
+    else h = ((r-g)/d + 4)/6;
+  }
+  return { h: h*360, s: s*100, l: l*100 };
+}
+function hslToHex(h, s, l) {
+  h = ((h%360)+360)%360; s /= 100; l /= 100;
+  const a = s * Math.min(l, 1-l);
+  const f = n => { const k=(n+h/30)%12; const c=l-a*Math.max(-1,Math.min(k-3,Math.min(9-k,1))); return Math.round(c*255).toString(16).padStart(2,'0'); };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+function applyTheme(hex, save = true) {
+  const { h, s, l } = hexToHSL(hex);
+  // Light vars
+  const lpc  = hslToHex(h, Math.min(s,80), 92);
+  const lopc = hslToHex(h, Math.min(s,80), 14);
+  const lsc  = hslToHex(h, Math.max(s*.45,15), 88);
+  const losc = hslToHex(h, Math.max(s*.45,15), 16);
+  const ltc  = hslToHex((h+55)%360, 55, 90);
+  const leqa = hslToHex(h, s, Math.max(l-13, 18));
+  const lopa = hslToHex(h, Math.max(s*.45,15), 82);
+  // Dark vars
+  const dp   = hslToHex(h, s*.7,  80);
+  const dpc  = hslToHex(h, s*.8,  28);
+  const dopc = hslToHex(h, s*.55, 90);
+  const dsc  = hslToHex(h, s*.4,  24);
+  const dosc = hslToHex(h, s*.3,  84);
+  const dtc  = hslToHex((h+55)%360, 38, 23);
+  // Inject via stylesheet so .dark can properly override :root (inline styles can't be overridden by class rules)
+  let st = document.getElementById('theme-override');
+  if (!st) { st = document.createElement('style'); st.id = 'theme-override'; document.head.appendChild(st); }
+  st.textContent =
+    `:root{--primary:${hex};--primary-c:${lpc};--on-primary-c:${lopc};--secondary-c:${lsc};--on-secondary-c:${losc};--tertiary-c:${ltc};--eq:${hex};--eq-a:${leqa};--op-bg:${lsc};--op-t:${losc};--op-a:${lopa}}` +
+    `.dark{--primary:${dp};--primary-c:${dpc};--on-primary-c:${dopc};--secondary-c:${dsc};--on-secondary-c:${dosc};--tertiary-c:${dtc};--eq:${dp};--eq-a:${hslToHex(h,s*.7,70)};--op-bg:${dsc};--op-t:${dosc};--op-a:${hslToHex(h,s*.4,32)}}`;
+  // Sync PWA theme-color meta tag
+  const mt = document.getElementById('meta-theme');
+  if (mt) mt.content = document.documentElement.classList.contains('dark') ? hslToHex(h, s*.7, 80) : hex;
+  // Update custom color picker
+  const ci = document.getElementById('custom-color');
+  if (ci) ci.value = hex;
+  // Update swatch active state
+  document.querySelectorAll('.cswatch').forEach(sw => sw.classList.toggle('active', sw.dataset.color === hex));
+  if (save) localStorage.setItem('calc-theme', hex);
+}
+
+function buildColorGrid() {
+  const saved = localStorage.getItem('calc-theme') || '#6750a4';
+  const grid = document.getElementById('color-grid');
+  PRESETS.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'cswatch' + (c === saved ? ' active' : '');
+    b.style.background = c;
+    b.dataset.color = c;
+    b.onclick = () => applyTheme(c);
+    grid.appendChild(b);
+  });
+}
+
+function openTheme()  { document.getElementById('theme-sheet').classList.add('open'); }
+function closeTheme() { document.getElementById('theme-sheet').classList.remove('open'); }
+function sheetBgClick(e) { if (e.target.classList.contains('theme-backdrop')) closeTheme(); }
+
+buildColorGrid();
+const savedTheme = localStorage.getItem('calc-theme');
+if (savedTheme) applyTheme(savedTheme, false);
+
+// ── DARK MODE ─────────────────────────────────────────────────────────────────
+function toggleDark() {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('calc-dark', isDark ? '1' : '0');
+  document.getElementById('dark-toggle').textContent = isDark ? '☀️' : '🌙';
+}
+if (localStorage.getItem('calc-dark') === '1') {
+  document.documentElement.classList.add('dark');
+  document.getElementById('dark-toggle').textContent = '☀️';
+}
+
+// ── SERVICE WORKER ────────────────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// ── KEYBOARD ──────────────────────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  const bs=document.getElementById('screen-basic').classList.contains('active');
+  const ss=document.getElementById('screen-scientific').classList.contains('active');
+  if(!bs&&!ss)return;
+  const N=bs?stdN:sciN,O=bs?stdOp:sciOp,E=bs?stdEq:sciEq,C=bs?stdAC:sciAC,D=bs?stdDot:sciDot;
+  if('0123456789'.includes(e.key)){N(e.key);return;}
+  if(e.key==='+'){O('+');return;}if(e.key==='-'){O('-');return;}
+  if(e.key==='*'){O('*');return;}if(e.key==='/'){e.preventDefault();O('/');return;}
+  if(e.key==='Enter'||e.key==='='){E();return;}if(e.key==='Escape'){C();return;}
+  if(e.key==='.'){D();return;}if(e.key==='Backspace'&&ss){sciBS();}
+});
+</script>
+</body>
+</html>
