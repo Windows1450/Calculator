@@ -1,4 +1,4 @@
-const CACHE = 'calc-v1';
+const CACHE = 'calc-v2';
 const FILES = ['./', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', e => {
